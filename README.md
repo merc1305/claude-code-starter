@@ -74,6 +74,7 @@ claude-code-starter/
 ├── CHANGELOG.md           ← история версий
 ├── LICENSE                ← MIT
 ├── .vscode/settings.json  ← настройки VS Code (видимость .business/ и др.)
+├── .claude/commands/      ← slash-команды планирования (/plan и этапы)
 ├── .github/
 │   ├── workflows/         ← CI: security-audit при push
 │   └── hooks/             ← pre-commit hook против утечки секретов (sample)
