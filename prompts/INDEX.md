@@ -37,7 +37,10 @@
 
 | Задача | Промпт |
 |---|---|
-| Критика плана через 3 параллельных субагента | [`methodology/plan-critique.md`](./methodology/plan-critique.md) |
+| Новая функция: идея → вопросы до 95% → первичный план | [`methodology/new-plan.md`](./methodology/new-plan.md) |
+| Критика плана: 4 вопроса по фазам + 3 параллельных субагента | [`methodology/plan-critique.md`](./methodology/plan-critique.md) |
+| Best-check: план - лучшее решение из существующих? | [`methodology/plan-best.md`](./methodology/plan-best.md) |
+| Premortem: «прошёл год - система провалилась, почему» | [`methodology/plan-premortem.md`](./methodology/plan-premortem.md) |
 | «10 причин обосраться» - стресс-тест перед важным шагом | [`methodology/10-reasons.md`](./methodology/10-reasons.md) |
 | Импорт существующего кода в `.business/` | [`methodology/import-existing-project.md`](./methodology/import-existing-project.md) |
 | Планирование недели | [`methodology/weekly-planning.md`](./methodology/weekly-planning.md) |
