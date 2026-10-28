@@ -22,4 +22,4 @@
 
 ## Пример
 
-См. [TEMPLATE.md](./TEMPLATE.md) как заготовку. Первое реальное ретро появится после шага 9b AUTOPILOT под именем `YYYY-MM-DD_HH-MM_hello-test.md` - это и будет живой образец на основе твоего проекта.
+Use [TEMPLATE.md](./TEMPLATE.md) when there is a useful lesson from completed work. Record actual outcomes and evidence; the adaptive workflow does not require a HELLO exercise or a numbered onboarding step.

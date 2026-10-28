@@ -1,14 +1,8 @@
 ---
-description: Этап 1 планирования - идея → вопросы до 95% → первичный план в plans/
-argument-hint: [идея текстом или путь к файлу/папке с идеей]
+description: Build or continue a plan from the idea, architecture and existing checkpoints
+argument-hint: [idea or path]
 ---
 
-Выполни канон `prompts/methodology/new-plan.md`.
+Follow `prompts/methodology/new-plan.md` using $ARGUMENTS and the current conversation. Read the shared workflow and discover existing plans before creating another. Ask only for missing context that changes the decision. Preserve an existing plan's approval and checkpoint; a genuinely new plan starts as черновик and requires independent review before implementation.
 
-Идея: $ARGUMENTS
-
-Если идея не передана - спроси, где она (текст, файл или папка). Дальше строго по канону: контекст → вопросы до 95% уверенности (с вариантами - плашками) → первичный план в `plans/YYYY-MM-DD-название.md` со статусом «черновик» → показать план целиком.
-
-По завершении спроси плашками: «Критика фаз сейчас» (следующий этап пайплайна, лучше в новом чате или субагентами с чистым контекстом) / «Стоп, достаточно».
-
-Всегда отвечай на русском.
+Respond in Russian.

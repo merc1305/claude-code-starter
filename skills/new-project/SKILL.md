@@ -1,86 +1,36 @@
 ---
 name: new-project
-description: |
-  Разворачивает новый проект из личного стартера merc1305/claude-code-starter:
-  свежий клон форка с GitHub, чистка шаблонных файлов, git init, приватный
-  репозиторий на GitHub, запуск онбординга AUTOPILOT.md.
-  Вызывай, когда пользователь говорит «стартуем новый проект», «разворачиваю
-  новый проект через мой стартер», «создай проект по моему шаблону»,
-  «new project from my starter».
+description: Bootstrap a new company or project from merc1305/claude-code-starter, create a private GitHub repository and start the adaptive Claude Code/Codex workflow. Use for new-project requests; starter maintenance does not itself authorize company creation.
 ---
 
-# Новый проект из стартера
+# New project from the owner's starter
 
-Этот файл - стаб. Вся логика живёт в `scripts/bootstrap-new-project.sh` внутри
-форка и забирается с GitHub в момент запуска. Не воспроизводи её здесь по памяти
-и не правь развёрнутый проект руками - если поведение не устраивает, чини скрипт
-в репозитории стартера.
+The implementation lives in `scripts/bootstrap-new-project.sh` in the GitHub fork. Fetch it fresh; do not reconstruct the bootstrap manually or use a stale local checkout.
 
-## Железные правила
+## Inputs and boundaries
 
-1. **Источник - только `merc1305/claude-code-starter` с GitHub.** Никаких локальных
-   копий стартера, никаких `~/sources/claude-code-starter` как источника файлов.
-2. **Upstream (`artemiimillier/claude-code-starter`) не трогать.** Ни клонировать,
-   ни мержить, ни добавлять как remote.
-3. **Репозиторий на GitHub - приватный.** Всегда `--private`.
-4. **Имя репозитория подтверждай у пользователя один раз перед созданием.**
-   Создание репозитория - действие наружу, молча его не делай.
+- Use `merc1305/claude-code-starter` only when creating a project. Do not merge upstream during project creation. Explicit starter-maintenance requests may update the fork.
+- Collect the kebab-case project name, destination (default `~/sources/<name>`) and idea only if not already provided. If the current empty directory is the intended destination, use it directly.
+- Before creating a remote, ensure the user has approved the exact name and location. Existing explicit approval counts; do not ask again. Always create a PRIVATE repository.
+- `.business/` stays tracked in private company repositories for backup and history. Do not exclude or untrack it. Never put passwords, tokens or personal client data there. Verify remote visibility before writing confidential business context or pushing it.
 
-## Шаги
+## Run the canonical bootstrap
 
-### 1. Собери вводные
-
-- **Имя проекта** - kebab-case, оно же имя папки и имя репозитория на GitHub.
-- **Путь** - по умолчанию `~/sources/<имя>`. Именно `~/sources`, потому что там
-  лежит `~/sources/CLAUDE.md` с правилами работы, и новый проект наследует их.
-- **Идея проекта** - один абзац. Обычно пользователь уже описал её в том же
-  сообщении, которым вызвал скилл. Не переспрашивай то, что уже сказано.
-
-Если текущая рабочая папка сессии уже пустая и предназначена под проект -
-разворачивай в `.`, не создавай вложенную папку.
-
-### 2. Подтверди и запусти
-
-Покажи пользователю одной строкой: куда развернёшь и какое имя будет у приватного
-репозитория. Дождись «да».
-
-Затем забери свежий скрипт с GitHub и запусти его:
+After authorization, fetch and execute:
 
 ```bash
-TMP=$(mktemp -d)
+task_tmp=$(mktemp -d)
 gh api repos/merc1305/claude-code-starter/contents/scripts/bootstrap-new-project.sh \
-  -H "Accept: application/vnd.github.raw" > "$TMP/bootstrap.sh"
-bash "$TMP/bootstrap.sh" <target-dir> <repo-name>
+  -H "Accept: application/vnd.github.raw" > "$task_tmp/bootstrap.sh" &&
+bash "$task_tmp/bootstrap.sh" <target-dir> <repo-name>
 ```
 
-Скрипт сам склонирует стартер, сделает два коммита, создаст приватный репозиторий
-и запушит. Флаг `--no-remote` - если пользователь явно попросил без GitHub.
+The script clones the current fork, makes two local commits, creates the private repository, verifies privacy and pushes. Use `--no-remote` only for an explicitly local project or isolated verification. Check exit status. If it fails, inspect the actual local and remote state and report the failed step; do not blindly rerun, create another repository, or claim success. Fix repeatable bootstrap defects in the starter, not through ad hoc reconstruction of a company.
 
-Если скрипт упал - покажи вывод как есть и остановись. Не доделывай его работу
-руками: половина развёрнутого проекта хуже, чем ничего.
+## Start from the user's context
 
-### 3. Запиши идею проекта
+Read the generated `CLAUDE.md` or `AGENTS.md`, `docs/workflow.md` and `AUTOPILOT.md`. Verify `.starter/provenance.json` records the fork and commit. Confirm `.business/INDEX.md` is tracked and the remote is private (or the project intentionally stays local).
 
-Открой `AUTOPILOT.md` в новом проекте и впиши идею во frontmatter:
+Write the supplied idea, known facts, uncertainties and immediate goal in `.business/INDEX.md`, preserving existing useful content. Do not store it in AUTOPILOT frontmatter. Ask only questions that affect the next decision; use the adaptive entry for idea, architecture, code or continuation. Progress and approval live in the active plan/checkpoint. There is no required numbered onboarding and no `completed: false` trigger.
 
-```yaml
-project_idea: <абзац со слов пользователя>
-```
-
-Это нужно, чтобы онбординг не спрашивал на шаге 1 то, что пользователь уже
-рассказал.
-
-### 4. Передай управление онбордингу
-
-Прочитай `AUTOPILOT.md` целиком и начни с шага 1.
-
-Важно про сессию: `CLAUDE.md` подхватывается агентом при **старте** сессии по
-текущей папке. Если проект развёрнут не в той папке, где идёт эта сессия, - скажи
-пользователю открыть новую сессию в папке проекта:
-
-```bash
-cd <target-dir> && claude    # или codex
-```
-
-Онбординг там стартует сам: `CLAUDE.md` стартера содержит STOP-блок, который
-срабатывает при `completed: false` в `AUTOPILOT.md`.
+If the project is outside the current chat directory, open a new session there so its instructions load. Explain the destination; do not imply the current session changed directory merely because bootstrap ran.

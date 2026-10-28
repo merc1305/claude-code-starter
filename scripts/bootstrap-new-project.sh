@@ -34,11 +34,13 @@ STARTER_ONLY=(
   CONTRIBUTING.md
   CODE_OF_CONDUCT.md
   SECURITY.md
-  LICENSE
   examples
   skills
   scripts/bootstrap-new-project.sh
   .github/ISSUE_TEMPLATE
+  tests/test_bootstrap.py
+  plans/2026-10-28-upstream-integration.md
+  feedback/2026-10-28-private-business-context.md
 )
 
 red()   { printf "\033[31m%s\033[0m\n" "$*" >&2; }
@@ -68,6 +70,15 @@ done
 
 [[ -n "$TARGET_ARG" ]] || die "не указана целевая папка. Запуск: bash $0 <target-dir> [repo-name] [--no-remote]"
 
+# Fail before creating files if the requested workflow cannot complete.
+for tool in git rsync python3; do
+  command -v "$tool" >/dev/null 2>&1 || die "required tool missing: $tool"
+done
+if [[ "$NO_REMOTE" != 1 ]]; then
+  command -v gh >/dev/null 2>&1 || die "gh is required (or use --no-remote)"
+  gh auth status >/dev/null 2>&1 || die "gh authentication is required"
+fi
+
 # --- валидация целевой папки -------------------------------------------------
 
 mkdir -p "$TARGET_ARG"
@@ -83,6 +94,13 @@ LEFTOVERS=$(find "$TARGET" -mindepth 1 -maxdepth 1 ! -name '.DS_Store' | head -5
 $LEFTOVERS"
 
 [[ -n "$REPO_NAME" ]] || REPO_NAME=$(basename "$TARGET")
+[[ "$REPO_NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || die "repo name must be lowercase kebab-case"
+if [[ "$NO_REMOTE" != 1 ]]; then
+  OWNER=$(gh api user -q .login)
+  if gh repo view "$OWNER/$REPO_NAME" >/dev/null 2>&1; then
+    die "repository $OWNER/$REPO_NAME already exists"
+  fi
+fi
 
 # Удаление только внутри TARGET. Скрипт может запускаться агентом без
 # подтверждений (Codex: approval_policy=never), поэтому проверка обязательна.
@@ -120,6 +138,7 @@ rsync -a --exclude='.git/' "$TMP/starter/" "$TARGET/"
 cd "$TARGET"
 git init --quiet -b main
 git add -A
+python3 scripts/check_secrets.py --staged
 git commit --quiet -m "chore: bootstrap from ${STARTER_SLUG}@${STARTER_SHORT}
 
 Source: https://github.com/${STARTER_SLUG}/tree/${STARTER_SHA}"
@@ -138,19 +157,19 @@ cat > "$TARGET/README.md" <<EOF
 
 Проект развёрнут из [${STARTER_SLUG}](https://github.com/${STARTER_SLUG})@${STARTER_SHORT}.
 
-Бизнес-контекст - в \`.business/INDEX.md\`, правила работы с агентом - в \`CLAUDE.md\`.
+Business context: \`.business/INDEX.md\` (tracked in this private repository).
+Claude Code and Codex instructions: \`docs/workflow.md\`, via \`CLAUDE.md\` and \`AGENTS.md\`.
+Start or resume with \`AUTOPILOT.md\`. Never publish this repository without reviewing its business context and history.
 EOF
 
-# Отметка о происхождении - чтобы потом можно было диффнуть с текущим шаблоном.
-if [[ -f "$TARGET/AUTOPILOT.md" ]]; then
-  sed -i.bak \
-    -e "s|^started_at: null$|started_at: $(date +%Y-%m-%d)|" \
-    -e "s|^last_completed_step: 0$|last_completed_step: 0\nbootstrapped_from: ${STARTER_SLUG}@${STARTER_SHA}|" \
-    "$TARGET/AUTOPILOT.md"
-  rm -f "$TARGET/AUTOPILOT.md.bak"
-fi
+# Provenance is independent of onboarding/checkpoint state.
+mkdir -p "$TARGET/.starter"
+cat > "$TARGET/.starter/provenance.json" <<EOF
+{"repository":"${STARTER_SLUG}","commit":"${STARTER_SHA}"}
+EOF
 
 git add -A
+python3 scripts/check_secrets.py --staged
 git commit --quiet -m "chore: remove starter-specific files"
 green "  дерево проекта готово"
 
@@ -158,17 +177,12 @@ green "  дерево проекта готово"
 
 if [[ "$NO_REMOTE" == 1 ]]; then
   info "→ GitHub пропущен (--no-remote)"
-elif ! command -v gh >/dev/null 2>&1; then
-  red "gh не установлен - репозиторий не создан, проект остался локальным"
-elif ! gh auth status >/dev/null 2>&1; then
-  red "gh не залогинен - репозиторий не создан, проект остался локальным"
 else
-  OWNER=$(gh api user -q .login)
-  if gh repo view "$OWNER/$REPO_NAME" >/dev/null 2>&1; then
-    die "репозиторий $OWNER/$REPO_NAME уже существует - выбери другое имя"
-  fi
-  info "→ Создаю приватный репозиторий $OWNER/$REPO_NAME"
-  gh repo create "$REPO_NAME" --private --source=. --remote=origin --push
+  info "→ Creating private repository $OWNER/$REPO_NAME"
+  gh repo create "$REPO_NAME" --private --source=. --remote=origin
+  VISIBILITY=$(gh repo view "$OWNER/$REPO_NAME" --json visibility --jq .visibility)
+  [[ "$VISIBILITY" == PRIVATE ]] || die "repository privacy not confirmed; nothing pushed"
+  git push -u origin main
   green "  https://github.com/$OWNER/$REPO_NAME (private)"
 fi
 
@@ -179,4 +193,4 @@ green "Готово: $TARGET"
 echo "Шаблон:  ${STARTER_SLUG}@${STARTER_SHORT}"
 echo "Коммиты: $(git rev-list --count HEAD)"
 echo
-echo "Дальше - онбординг: прочитай AUTOPILOT.md и начни с шага 1."
+echo "Next: read AUTOPILOT.md and docs/workflow.md; use existing context and continue the active plan."

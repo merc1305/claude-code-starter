@@ -2,7 +2,7 @@
 
 > Это **второй мозг** твоего проекта. Клод читает этот файл первым перед любой задачей, связанной с бизнесом.
 >
-> Папка `.business/` - приватный контекст. В исходном шаблоне она tracked (плейсхолдеры). На последнем шаге онбординга (10a AUTOPILOT) Клод добавит `.business/` в `.gitignore` и снимет с git tracking - после этого твои заполненные данные не попадут в публичный репо.
+> Keep `.business/` tracked in the owner's PRIVATE company repository for history and backup. Verify GitHub visibility before recording confidential business context. Never add this folder to ignore or untrack it during private-company setup. The public starter contains placeholders only; secrets and personal client data never belong here. Follow the shared workflow linked from CLAUDE.md or AGENTS.md.
 
 ## [НАЗВАНИЕ ПРОЕКТА]
 
@@ -24,4 +24,4 @@
 
 ---
 
-*Этот файл перегенерируется автоматически в конце онбординга (шаг 8 AUTOPILOT). Здесь временные плейсхолдеры.*
+*These are starter placeholders. Replace them with known facts as the adaptive workflow needs them; preserve existing useful context and expand the index only when needed.*

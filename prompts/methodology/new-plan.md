@@ -1,31 +1,17 @@
-# Планирование: идея → вопросы до 95% → первичный план
+# Plan an approved result from existing context
 
-**Когда брать:** в начале любой новой функции/задачи, до первой строчки реализации.
-**Что делает:** читает идею, добирает контекст вопросами до 95% уверенности, пишет первичный план по правилам `plans/`.
-**Результат:** `plans/YYYY-MM-DD-название.md` - цель, гипотезы, технические решения, фазы.
-
-## Промпт
+Use the shared workflow linked from CLAUDE.md/AGENTS.md. A plan covers one agreed result, potentially many functions and phases.
 
 ```prompt
-Прочитай мою идею: [текст идеи / путь к файлу или папке].
+Read the supplied idea or task and the relevant business index, architecture and existing checkpoints. Search for an active plan in the existing architecture as well as plans/. If an existing plan covers this result, continue or amend it; do not create a duplicate.
 
-1. Прочитай .business/INDEX.md + связанные файлы по теме задачи. Нет папки (чужая копия репо) - отметь это и работай без неё.
-2. Задай вопросы, пока не уверен на 95%. Вопросы с вариантами - плашками (AskUserQuestion), открытые - текстом. Все вопросы - сейчас, не в середине работы.
-3. Когда уверен - напиши первичный план в plans/YYYY-MM-DD-название.md по шаблону plans/TEMPLATE.md.
+Ask only for information that changes the next decision and is not already available. Record facts separately from hypotheses and estimates. Create plans/YYYY-MM-DD-name.md from the template only when no suitable plan exists.
 
-В плане обязательно:
-- цель - одно предложение: что делаем и зачем;
-- гипотезы - проверяемые ставки: что должно оказаться правдой, чтобы затея сработала; падает гипотеза - пересматривается ветка плана;
-- технические решения - что выбрали и почему, отклонённые альтернативы с причинами;
-- последовательность - фазы, у каждой конкретный проверяемый результат и статус [ ]/[x], в конце итоговый блок.
+Include the full outcome, scope, technical choices and rejected alternatives, phases with acceptance criteria, tests, permissions, limits and rollback. Preserve the stage journal and checkpoint. An approved existing scope stays approved; substantial changes need approval.
 
-Статус в шапке: «черновик». Покажи план целиком.
+For a new plan, use status черновик, obtain independent review and judge the findings before asking for owner approval. For continuation, retain the real status and resume the checkpoint after verifying it against code and tests.
 
-Всегда отвечай на русском.
+Respond to the owner in Russian.
 ```
 
-## Правила
-
-- Один план = одна функция (`plans/README.md`).
-- Цифры в плане - только из реальных данных или с пометкой «оценка».
-- Следующий шаг после первичного плана - критика фаз: `prompts/methodology/plan-critique.md` или команда `/plan`.
+Optional next stage: prompts/methodology/plan-critique.md or /plan.

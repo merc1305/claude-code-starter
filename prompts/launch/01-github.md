@@ -1,62 +1,15 @@
-# Залить код на GitHub
+# Create a private GitHub repository
 
-**Когда брать:** когда проект готов к тому, чтобы его можно было посмотреть или задеплоить.
-**Что делает:** создаёт приватный репо на GitHub, делает первый коммит, пушит.
-**Результат:** твой код в облаке, видишь по ссылке.
-
-## Зачем
-
-GitHub = Яндекс.Диск для кода, только с историей изменений. Сломал что-то - откатился. Без GitHub любая ошибка Клода может убить проект.
-
-Три термина, которые нужно знать:
-- **Репозиторий** - папка проекта в облаке
-- **Коммит** - сохранение изменений (как Ctrl+S для всего проекта)
-- **Пуш** - отправка коммитов в облако
-
-## Регистрация (если нет аккаунта)
-
-- Зайди на [github.com](https://github.com) и создай аккаунт
-- Запомни логин и пароль
-- Желательно настроить 2FA (в Settings → Password and authentication)
-
-## Промпт
+Use this when the owner has authorized the repository name and publication of the project to private GitHub. The new-project bootstrap already performs these steps.
 
 ```prompt
-Подключи этот проект к GitHub.
+Connect this project to GitHub using the approved repository name.
 
-1. Если у меня ещё нет репозитория - создай ПРИВАТНЫЙ репозиторий на GitHub. Назови по имени моего проекта.
-2. Сделай первый коммит со всем кодом проекта (с учётом .gitignore - не коммить .env, .business/, node_modules).
-3. Запуши в GitHub.
-4. Покажи мне ссылку на репозиторий.
-
-Если нужна авторизация GitHub - объясни пошагово что нажать.
+1. Inspect existing remotes and repository state. Do not overwrite a remote or create a duplicate repository. If needed, create a PRIVATE repository.
+2. Verify GitHub visibility is PRIVATE before pushing business context. Keep .business/ tracked for the owner's history and backup. Never untrack or ignore it as part of private-company setup.
+3. Review staged changes and run the secret scanner. Never commit .env, local credentials/settings, dependencies or credentials embedded in source. Stage intended files by name.
+4. Commit and push within the authorized scope. Report failures without claiming success; preserve local work.
+5. Verify the remote commit and show the repository link.
 ```
 
-## Проверка
-
-Открой ссылку на репо в браузере. Видишь свои файлы? Код в безопасности.
-
-## Попробуй откат (необязательно, но полезно)
-
-Хочешь убедиться что откат работает?
-
-```prompt
-Удали главную страницу проекта.
-```
-
-Он удалит. Потом:
-
-```prompt
-Откати последние изменения. Верни всё как было.
-```
-
-Восстановил? Вот и вся магия GitHub. Теперь ты в безопасности - экспериментируй смело.
-
-## Что НЕ коммитить никогда
-
-Проверь `.gitignore`, там должно быть:
-- `.env` и `.env.local`
-- `.business/` (бизнес-контекст - это приватно)
-- `.claude/settings.local.json`
-- `node_modules/`
-- API-ключи в коде (ключи только в `.env`)
+Private visibility does not make secrets safe to commit. Do not change the repository to public without an explicit review of business data and Git history.
