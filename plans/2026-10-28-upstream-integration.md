@@ -1,7 +1,7 @@
 # Plan: integrate upstream while preserving the owner's starter workflow
 
 Date: 2026-10-28
-Status: approved
+Status: completed
 Approval: owner explicitly authorized integration, four adaptations, new-project verification and push in this chat.
 
 ## Scope and acceptance
@@ -20,7 +20,7 @@ One implementation phase and one release verification phase. No model API spend,
 ## Phases
 
 - [x] Integrate code, docs, skill and regression tests; full suite and independent review.
-- [ ] Commit and push to origin/main after checks; verify remote SHA and fresh-clone new-project smoke run; sync the local skill with a backup.
+- [x] Commit and push to origin/main after checks; verify remote SHA and fresh-clone new-project smoke run; sync the local skill with a backup.
 
 ## Checkpoint
 
@@ -40,3 +40,7 @@ Re-review: initial findings resolved. Accepted final stale INDEX footer correcti
 ## Pre-push verification
 
 `bash scripts/security-audit.sh`: 41 tests passed on the owner's Mac using its default temporary directory; 123 index blobs scanned without findings. `bash -n scripts/bootstrap-new-project.sh`, `git diff --cached --check` and skill-creator quick_validate passed. Both installed skill aliases now read the updated skill; the original file is backed up outside the repository. No real company repository was created. Next: push and smoke-test the live fork with --no-remote.
+
+## Release verification
+
+Merged and pushed e1285b6 to the fork main branch using the owner's existing SSH key (the HTTPS OAuth credential lacks workflow-write scope). Fresh script fetched via GitHub API and bootstrap cloned that exact commit; --no-remote produced two commits, a clean worktree, tracked .business, preserved LICENSE and agent entrypoints, correct provenance and no remote. All 35 remaining tests in the generated project passed. GitHub Actions is enabled and the workflow is active, but no hosted run was returned during verification; only local macOS results are claimed. CI is configured for Linux and macOS. No actual company repository, deployment or model API spend. All requested adaptations complete.
